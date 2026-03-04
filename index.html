@@ -105,7 +105,7 @@ h2.section-title strong{font-weight:700}
 .grow-num{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;color:var(--gold-lt);line-height:1;display:block}
 .grow-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,240,232,.55);margin-top:6px;display:block}
 .bundles-section{background:var(--warm)}
-.bundles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.bundles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;align-items:start}
 .bundle-card{background:var(--cream);border:1px solid rgba(196,146,74,.18);border-radius:16px;padding:36px 28px;position:relative;transition:all .3s}
 .bundle-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(42,34,24,.1)}
 .bundle-card.featured{background:var(--ink);border-color:var(--gold)}
@@ -283,23 +283,60 @@ footer p{font-size:.8rem}
   <div class="reveal"><div class="section-eyebrow">Best Value</div><h2 class="section-title">More books, <em>more savings.</em></h2></div>
   <div class="bundles-grid reveal">
     <div class="bundle-card">
-      <h3>Starter Collection</h3><p class="bundle-books">10 curated books · Perfect beginning</p>
-      <div class="bundle-price">$29.99</div><p class="bundle-save">Save $20 vs individual pricing</p>
-      <ul class="bundle-features"><li>Mental Health & Mindfulness</li><li>Nutrition & Diet</li><li>Fitness & Movement</li><li>Sleep & Recovery</li><li>+ 6 more essential books</li></ul>
-      <button class="btn-bundle" onclick="showBundle('starter')">Begin Your Journey</button>
+      <h3>Build Your Own</h3>
+      <p class="bundle-books">Any 5 books · Your choice</p>
+      <div class="bundle-price">$29.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:var(--soft)">$34.95</span>
+        <span style="background:rgba(74,122,90,.15);color:var(--sage-dk);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $4.96</span>
+      </div>
+      <p class="bundle-save">Pick exactly what you need</p>
+      <ul class="bundle-features">
+        <li>Choose any 5 titles</li>
+        <li>Mix & match freely</li>
+        <li>Perfect starter gift</li>
+        <li>Instant download</li>
+        <li>No expiry ever</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('niche')">Choose My Books</button>
     </div>
     <div class="bundle-card featured">
-      <div class="bundle-badge">Most Loved</div>
-      <h3>Complete Library</h3><p class="bundle-books">All 50+ books · All future books included</p>
-      <div class="bundle-price">$99.99</div><p class="bundle-save">Save $150+ · Every new title forever</p>
-      <ul class="bundle-features"><li>Every book in the library</li><li>All future releases — free</li><li>Lifetime access forever</li><li>New books every month</li><li>Priority support</li></ul>
-      <button class="btn-bundle" onclick="showBundle('complete')">Get Lifetime Access</button>
+      <div class="bundle-badge">Most Popular</div>
+      <h3>Starter Collection</h3>
+      <p class="bundle-books">Any 10 books · Perfect beginning</p>
+      <div class="bundle-price">$54.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:rgba(184,168,152,.5)">$69.90</span>
+        <span style="background:rgba(196,146,74,.2);color:var(--gold-lt);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $14.91</span>
+      </div>
+      <p class="bundle-save">Best seller — most customers start here</p>
+      <ul class="bundle-features">
+        <li>Pick any 10 titles you love</li>
+        <li>Every health category covered</li>
+        <li>Instant download all 10</li>
+        <li>Lifetime access forever</li>
+        <li>30-day money back guarantee</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('starter')">Begin Your Journey</button>
     </div>
     <div class="bundle-card">
-      <h3>Build Your Own</h3><p class="bundle-books">Any 5 books · Your choice</p>
-      <div class="bundle-price">$19.99</div><p class="bundle-save">Choose exactly what you need</p>
-      <ul class="bundle-features"><li>Pick any 5 titles</li><li>Mix & match freely</li><li>A thoughtful gift idea</li><li>Instant download</li><li>No expiry ever</li></ul>
-      <button class="btn-bundle" onclick="showBundle('niche')">Choose My Books</button>
+      <div class="bundle-badge" style="background:var(--sage-dk);color:var(--cream)">Best Value</div>
+      <h3>Mega Bundle</h3>
+      <p class="bundle-books">Any 20 books · Maximum wellness</p>
+      <div class="bundle-price">$99.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:var(--soft)">$139.80</span>
+        <span style="background:rgba(74,122,90,.15);color:var(--sage-dk);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $39.81</span>
+      </div>
+      <p class="bundle-save">Biggest saving — transform every area of health</p>
+      <ul class="bundle-features">
+        <li>Choose any 20 titles</li>
+        <li>Complete health transformation</li>
+        <li>Instant download all 20</li>
+        <li>Lifetime access forever</li>
+        <li>30-day money back guarantee</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('mega')">Get the Mega Bundle</button>
     </div>
   </div>
 </section>
@@ -495,7 +532,7 @@ function showBundle(type){
   const bundles={
     starter:{title:"Starter Collection",price:"$29.99",desc:"10 beautifully curated books to begin your Luminae journey — mental health, nutrition, fitness, sleep, natural healing, gut health, women's health, stress recovery, healthy ageing, and complete wellness. Save $20 vs individual."},
     complete:{title:"Complete Library — All Books Forever",price:"$99.99",desc:"Every single Luminae book — now and forever. All current titles plus every new book released going forward. One purchase, unlimited lifetime access. The most generous offer we make."},
-    niche:{title:"Build Your Own — Any 5 Books",price:"$19.99",desc:"Choose any 5 titles from the Luminae library. Email your selections after purchasing and receive your personalised bundle instantly. A perfect thoughtful gift."},
+    niche:{title:"Build Your Own — Any 5 Books",price:"$29.99",desc:"Choose any 5 titles from the Luminae library. Email your selections after purchasing and receive your personalised bundle instantly. A perfect thoughtful gift."},
   };
   const b=bundles[type];
   document.getElementById('modalEyebrow').textContent='Bundle · Luminae Health Library';
