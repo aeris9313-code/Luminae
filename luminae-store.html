@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luminae — Health & Wellness Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--blush:#FAF0E8;--warm:#F5E6D3;--petal:#EDD5BE;--sage:#7A9E8A;--sage-lt:#A8C4B4;--sage-dk:#4A7A5A;--gold:#C4924A;--gold-lt:#E8C08A;--cream:#FFFDF9;--ink:#2A2218;--mist:#8A7A6A;--soft:#B8A898;--white:#FFFFFF}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:22px 64px;background:rgba(255,253,249,0.94);backdrop-filter:blur(16px);border-bottom:1px solid rgba(196,146,74,0.12)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;letter-spacing:.04em;color:var(--ink);text-decoration:none;display:flex;align-items:baseline;gap:2px}
+.nav-logo span{color:var(--gold);font-style:italic}
+.nav-logo sup{font-size:.55rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);font-family:'DM Sans',sans-serif;margin-left:6px;vertical-align:super}
+.nav-links{display:flex;gap:38px;list-style:none}
+.nav-links a{font-size:.82rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{background:var(--sage-dk);color:var(--cream);padding:11px 28px;border-radius:30px;font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:all .25s;border:1.5px solid var(--sage-dk)}
+.nav-cta:hover{background:transparent;color:var(--sage-dk)}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:130px 64px 80px;position:relative;overflow:hidden;z-index:1}
+.hero::before{content:'';position:absolute;right:-100px;top:-100px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(196,146,74,.08) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;left:-80px;bottom:-80px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(122,158,138,.1) 0%,transparent 70%);pointer-events:none}
+.hero-text{padding-right:70px;position:relative;z-index:1}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;background:rgba(196,146,74,.1);border:1px solid rgba(196,146,74,.2);border-radius:30px;padding:7px 18px;font-size:.75rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:30px;opacity:0;animation:fadeUp .8s .2s forwards}
+.hero-eyebrow::before{content:'✦';font-size:.7rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(3rem,5vw,5.5rem);font-weight:400;line-height:1.08;color:var(--ink);margin-bottom:16px;opacity:0;animation:fadeUp .9s .3s forwards}
+.hero h1 em{font-style:italic;color:var(--sage-dk)}
+.hero h1 .line2{display:block;font-weight:700;color:var(--ink)}
+.hero-sub{font-size:1.05rem;line-height:1.85;color:var(--mist);max-width:460px;margin:26px 0 42px;opacity:0;animation:fadeUp .9s .45s forwards}
+.hero-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;opacity:0;animation:fadeUp .9s .6s forwards}
+.btn-primary{background:var(--sage-dk);color:var(--cream);padding:15px 36px;border-radius:30px;text-decoration:none;font-size:.88rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;transition:all .25s;border:1.5px solid var(--sage-dk);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-primary:hover{background:transparent;color:var(--sage-dk);transform:translateY(-2px)}
+.btn-ghost{color:var(--ink);text-decoration:none;font-size:.88rem;letter-spacing:.06em;display:flex;align-items:center;gap:8px;transition:gap .2s,color .2s}
+.btn-ghost:hover{gap:14px;color:var(--gold)}
+.btn-ghost::after{content:'→'}
+.hero-visual{position:relative;height:580px;opacity:0;animation:fadeIn 1.2s .4s forwards;z-index:1}
+.book-fan{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:340px;height:460px}
+.fan-book{position:absolute;width:190px;height:268px;border-radius:4px 10px 10px 4px;box-shadow:0 16px 50px rgba(42,34,24,.22);transition:transform .5s ease,box-shadow .5s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 14px;text-align:center;cursor:pointer;overflow:hidden}
+.fan-book:hover{box-shadow:0 28px 70px rgba(42,34,24,.32)!important;z-index:10;transform:rotate(0deg) translateY(-10px)!important}
+.fan-book::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:rgba(0,0,0,.2);border-radius:4px 0 0 4px}
+.fan-book:nth-child(1){bottom:0;left:0;transform:rotate(-9deg);background:linear-gradient(160deg,#1A0E30,#2D1A50)}
+.fan-book:nth-child(2){bottom:20px;left:50px;transform:rotate(-4deg);background:linear-gradient(160deg,#0A1E10,#163028)}
+.fan-book:nth-child(3){bottom:40px;left:100px;transform:rotate(1deg);background:linear-gradient(160deg,#1E0C06,#321808)}
+.fan-book:nth-child(4){bottom:60px;left:60px;transform:rotate(6deg);background:linear-gradient(160deg,#001220,#023040)}
+.fan-book:nth-child(5){bottom:100px;left:20px;transform:rotate(-12deg);background:linear-gradient(160deg,#1A000C,#300020)}
+.fan-accent{position:absolute;top:0;left:6px;right:0;height:2px}
+.fan-icon{font-size:2rem;margin-bottom:12px}
+.fan-title{font-family:'Playfair Display',serif;font-size:.88rem;font-weight:500;color:#fff;line-height:1.3;margin-bottom:8px}
+.fan-divider{width:24px;height:1px;background:rgba(232,192,138,.7);margin:0 auto 8px}
+.fan-by{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(228,192,138,.8)}
+.hero-floating{position:absolute;right:-10px;bottom:50px;display:flex;flex-direction:column;gap:12px}
+.float-pill{background:var(--white);border:1px solid rgba(196,146,74,.2);border-radius:40px;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(42,34,24,.1);white-space:nowrap}
+.pill-icon{font-size:1.2rem}
+.pill-text strong{display:block;font-size:.85rem;font-weight:600;color:var(--ink)}
+.pill-text span{font-size:.72rem;color:var(--mist)}
+.marquee-wrap{background:var(--ink);padding:16px 0;overflow:hidden;white-space:nowrap;position:relative;z-index:1}
+.marquee-track{display:inline-flex;gap:40px;animation:marquee 35s linear infinite}
+.marquee-item{font-size:.75rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,192,138,.6);display:flex;align-items:center;gap:40px}
+.marquee-item::after{content:'✦';color:var(--gold);opacity:.6}
+section{padding:100px 64px;position:relative;z-index:1}
+.section-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.72rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.section-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--gold-lt)}
+h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,3.8vw,3.6rem);font-weight:400;line-height:1.12;color:var(--ink);max-width:580px;margin-bottom:16px}
+h2.section-title em{font-style:italic;color:var(--sage-dk)}
+h2.section-title strong{font-weight:700}
+.promise-strip{background:var(--warm);padding:60px 64px;position:relative;z-index:1}
+.promise-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(196,146,74,.15)}
+.promise-item{padding:40px 32px;border-right:1px solid rgba(196,146,74,.15);transition:background .3s}
+.promise-item:last-child{border-right:none}
+.promise-item:hover{background:rgba(255,255,255,.6)}
+.promise-num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:8px;opacity:.4}
+.promise-item h3{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:var(--ink);margin-bottom:10px}
+.promise-item p{font-size:.88rem;line-height:1.75;color:var(--mist)}
+.books-section{background:var(--cream)}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin:36px 0 44px}
+.filter-btn{padding:8px 22px;border-radius:30px;cursor:pointer;font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;border:1.5px solid rgba(122,158,138,.3);background:transparent;color:var(--mist);font-family:'DM Sans',sans-serif}
+.filter-btn.active,.filter-btn:hover{background:var(--sage-dk);color:var(--cream);border-color:var(--sage-dk)}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
+.book-item{cursor:pointer;transition:transform .3s}
+.book-item:hover{transform:translateY(-6px)}
+.book-cover{height:280px;border-radius:4px 12px 12px 4px;position:relative;overflow:hidden;box-shadow:0 8px 36px rgba(42,34,24,.18);margin-bottom:14px}
+.book-cover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:rgba(0,0,0,.25);z-index:1}
+.book-cover-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 16px;text-align:center;z-index:2}
+.cover-num{position:absolute;top:10px;right:12px;font-size:.6rem;font-weight:600;letter-spacing:.12em;color:rgba(255,255,255,.3);z-index:2}
+.cover-icon{font-size:2.1rem;margin-bottom:12px}
+.cover-title{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:500;line-height:1.25;color:#fff;margin-bottom:8px}
+.cover-line{width:26px;height:1px;background:rgba(232,192,138,.7);margin:0 auto 8px}
+.cover-byline{font-size:.6rem;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,192,138,.85)}
+.book-title-text{font-family:'Playfair Display',serif;font-size:.98rem;font-weight:500;color:var(--ink);line-height:1.35;margin-bottom:6px}
+.book-price-row{display:flex;align-items:center;justify-content:space-between}
+.book-price{font-size:.92rem;font-weight:600;color:var(--sage-dk)}
+.book-pages{font-size:.72rem;color:var(--soft)}
+.btn-buy{display:block;width:100%;margin-top:10px;background:var(--warm);color:var(--sage-dk);padding:9px;border-radius:30px;text-align:center;font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;border:1.5px solid rgba(122,158,138,.4);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-buy:hover{background:var(--sage-dk);color:var(--cream);border-color:var(--sage-dk)}
+.growing-banner{background:linear-gradient(135deg,var(--sage-dk) 0%,#2A5A3A 100%);padding:70px 64px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:60px;position:relative;overflow:hidden;z-index:1}
+.growing-banner::before{content:'∞';position:absolute;right:200px;top:50%;transform:translateY(-50%);font-size:18rem;color:rgba(255,255,255,.04);font-family:'Playfair Display',serif;line-height:1;pointer-events:none}
+.growing-banner h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3.2rem);font-weight:400;color:var(--cream);line-height:1.15;margin-bottom:16px}
+.growing-banner h2 em{font-style:italic;color:var(--gold-lt)}
+.growing-banner p{font-size:1rem;color:rgba(250,240,232,.7);line-height:1.8;max-width:520px}
+.growing-stats{display:flex;flex-shrink:0}
+.grow-stat{padding:28px 36px;text-align:center;border-left:1px solid rgba(255,255,255,.1)}
+.grow-stat:first-child{border-left:none}
+.grow-num{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;color:var(--gold-lt);line-height:1;display:block}
+.grow-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,240,232,.55);margin-top:6px;display:block}
+.bundles-section{background:var(--warm)}
+.bundles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;align-items:start}
+.bundle-card{background:var(--cream);border:1px solid rgba(196,146,74,.18);border-radius:16px;padding:36px 28px;position:relative;transition:all .3s}
+.bundle-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(42,34,24,.1)}
+.bundle-card.featured{background:var(--ink);border-color:var(--gold)}
+.bundle-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 18px;border-radius:20px;white-space:nowrap}
+.bundle-card h3{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;margin-bottom:8px;line-height:1.2}
+.bundle-card:not(.featured) h3{color:var(--ink)}
+.bundle-card.featured h3{color:var(--cream)}
+.bundle-books{font-size:.82rem;margin-bottom:20px}
+.bundle-card:not(.featured) .bundle-books{color:var(--mist)}
+.bundle-card.featured .bundle-books{color:var(--gold-lt)}
+.bundle-price{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;line-height:1;margin-bottom:4px}
+.bundle-card:not(.featured) .bundle-price{color:var(--sage-dk)}
+.bundle-card.featured .bundle-price{color:var(--gold-lt)}
+.bundle-save{font-size:.78rem;margin-bottom:28px}
+.bundle-card:not(.featured) .bundle-save{color:var(--mist)}
+.bundle-card.featured .bundle-save{color:rgba(232,192,138,.7)}
+.bundle-features{list-style:none;margin-bottom:32px}
+.bundle-features li{font-size:.85rem;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;gap:10px}
+.bundle-card.featured .bundle-features li{border-bottom-color:rgba(255,255,255,.08);color:rgba(250,240,232,.75)}
+.bundle-card:not(.featured) .bundle-features li{color:var(--mist)}
+.bundle-features li::before{content:'✦';color:var(--gold);font-size:.65rem}
+.btn-bundle{display:block;width:100%;text-align:center;padding:14px;border-radius:30px;font-size:.82rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:all .25s;cursor:pointer;font-family:'DM Sans',sans-serif}
+.bundle-card:not(.featured) .btn-bundle{background:var(--warm);color:var(--sage-dk);border:1.5px solid rgba(122,158,138,.4)}
+.bundle-card:not(.featured) .btn-bundle:hover{background:var(--sage-dk);color:var(--cream)}
+.bundle-card.featured .btn-bundle{background:var(--gold);color:var(--ink);border:1.5px solid var(--gold)}
+.bundle-card.featured .btn-bundle:hover{background:var(--gold-lt)}
+.testimonials-section{background:var(--cream)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.testimonial-card{background:var(--warm);border-radius:16px;padding:36px 32px;transition:transform .3s;border:1px solid rgba(196,146,74,.1)}
+.testimonial-card:hover{transform:translateY(-4px)}
+.t-quote{font-family:'Playfair Display',serif;font-size:3.5rem;color:var(--gold-lt);line-height:.7;margin-bottom:18px;opacity:.7}
+.t-text{font-size:.95rem;line-height:1.85;color:var(--mist);margin-bottom:28px;font-style:italic;font-family:'Playfair Display',serif}
+.t-author{display:flex;align-items:center;gap:14px}
+.t-avatar{width:44px;height:44px;border-radius:50%;background:var(--sage-dk);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--cream);flex-shrink:0}
+.t-name{font-size:.9rem;font-weight:500;color:var(--ink)}
+.t-role{font-size:.78rem;color:var(--soft)}
+.stars{color:var(--gold);font-size:.82rem;letter-spacing:2px;margin-bottom:14px}
+.guarantee-section{background:var(--warm);display:grid;grid-template-columns:auto 1fr;gap:80px;align-items:center;padding:100px 64px}
+.guarantee-visual{display:flex;align-items:center;justify-content:center}
+.g-badge{width:240px;height:240px;border-radius:50%;border:2px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;background:radial-gradient(circle,rgba(196,146,74,.07) 0%,transparent 70%);position:relative}
+.g-badge::before{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(196,146,74,.25)}
+.g-num{font-family:'Playfair Display',serif;font-size:3.6rem;font-weight:700;color:var(--gold);line-height:1}
+.g-badge p{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mist);margin-top:6px}
+.guarantee-text p{font-size:1rem;line-height:1.9;color:var(--mist);margin:22px 0 34px;max-width:500px}
+.faq-section{background:var(--cream)}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 64px;margin-top:56px}
+.faq-item{border-bottom:1px solid rgba(196,146,74,.15);padding:24px 0;cursor:pointer}
+.faq-q{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:500;color:var(--ink);line-height:1.4}
+.faq-icon{font-size:1.3rem;color:var(--sage);flex-shrink:0;transition:transform .3s}
+.faq-a{font-size:.9rem;line-height:1.82;color:var(--mist);max-height:0;overflow:hidden;transition:max-height .4s ease,margin .3s}
+.faq-item.open .faq-a{max-height:200px;margin-top:14px}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.newsletter{background:var(--ink);text-align:center;padding:80px 64px;position:relative;overflow:hidden;z-index:1}
+.newsletter::before{content:'Luminae';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:clamp(5rem,14vw,16rem);font-weight:700;color:rgba(196,146,74,.04);letter-spacing:.06em;white-space:nowrap;pointer-events:none}
+.newsletter .section-eyebrow{color:var(--gold-lt);justify-content:center}
+.newsletter .section-eyebrow::before{background:var(--gold-lt)}
+.newsletter h2{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4vw,4.2rem);font-weight:400;color:var(--cream);max-width:620px;margin:0 auto 16px;line-height:1.12}
+.newsletter h2 em{font-style:italic;color:var(--gold-lt)}
+.newsletter p{font-size:.98rem;color:rgba(250,240,232,.6);max-width:460px;margin:0 auto 44px;line-height:1.85}
+.newsletter-form{display:flex;gap:0;max-width:460px;margin:0 auto}
+.newsletter-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(196,146,74,.25);border-right:none;border-radius:30px 0 0 30px;padding:14px 22px;font-size:.9rem;color:var(--cream);outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.newsletter-input:focus{border-color:var(--gold)}
+.newsletter-input::placeholder{color:rgba(250,240,232,.3)}
+.newsletter-btn{background:var(--gold);color:var(--ink);border:none;padding:14px 28px;border-radius:0 30px 30px 0;font-size:.85rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.newsletter-btn:hover{background:var(--gold-lt)}
+.cta-row{display:flex;gap:16px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+.newsletter .btn-primary{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.newsletter .btn-primary:hover{background:transparent;color:var(--gold-lt);border-color:var(--gold-lt)}
+.newsletter .btn-ghost{color:rgba(250,240,232,.7)}
+.newsletter .btn-ghost:hover{color:var(--gold-lt)}
+footer{background:#1A1408;color:rgba(250,240,232,.35);padding:48px 64px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+footer .nav-logo{color:rgba(250,240,232,.6);font-size:1.4rem}
+footer .nav-logo span{color:var(--gold)}
+footer p{font-size:.8rem}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:.8rem;color:rgba(250,240,232,.35);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(42,34,24,.75);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--cream);border-radius:16px;width:90%;max-width:540px;max-height:90vh;overflow-y:auto;padding:52px 44px;position:relative;transform:translateY(20px);transition:transform .3s;border:1px solid rgba(196,146,74,.15)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-close{position:absolute;top:18px;right:20px;background:none;border:none;font-size:1.5rem;color:var(--soft);cursor:pointer;transition:color .2s}
+.modal-close:hover{color:var(--ink)}
+.modal-eyebrow{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:500;color:var(--ink);margin-bottom:12px;line-height:1.2}
+.modal-tagline{font-size:.92rem;color:var(--sage-dk);font-style:italic;margin-bottom:20px;font-family:'Playfair Display',serif}
+.modal-desc{font-size:.9rem;line-height:1.85;color:var(--mist);margin-bottom:26px}
+.modal-price-row{display:flex;align-items:baseline;gap:14px;margin-bottom:28px}
+.modal-price{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;color:var(--ink)}
+.modal-detail{font-size:.82rem;color:var(--soft)}
+.modal .btn-primary{width:100%;display:block;text-align:center;border:1.5px solid var(--sage-dk)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:1100px){.hero{grid-template-columns:1fr;text-align:center;padding:130px 40px 70px}.hero-text{padding-right:0}.hero-sub{margin:26px auto 42px}.hero-actions{justify-content:center}.hero-visual{display:none}.bundles-grid{grid-template-columns:1fr}.guarantee-section{grid-template-columns:1fr;text-align:center}.guarantee-visual{margin-bottom:40px}.faq-grid{grid-template-columns:1fr}.testimonials-grid{grid-template-columns:1fr}.growing-banner{grid-template-columns:1fr}.promise-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){nav{padding:16px 24px}.nav-links{display:none}section,.guarantee-section,.promise-strip,.growing-banner,.newsletter{padding:64px 24px}.promise-grid{grid-template-columns:1fr}footer{flex-direction:column;text-align:center}.newsletter-form{flex-direction:column}.newsletter-input{border-right:1px solid rgba(196,146,74,.25);border-radius:30px;margin-bottom:12px}.newsletter-btn{border-radius:30px}}
+</style></head>
+<body>
+<nav>
+  <a href="#" class="nav-logo">Luminae<span>.</span><sup>Health Library</sup></a>
+  <ul class="nav-links"><li><a href="#books">Library</a></li><li><a href="#bundles">Bundles</a></li><li><a href="#about">About</a></li><li><a href="#faq">FAQ</a></li></ul>
+  <a href="#bundles" class="nav-cta">Shop Now</a>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-text">
+    <div class="hero-eyebrow">Growing Library · New Books Every Month</div>
+    <h1><em>Nourish</em> your mind,<br><span class="line2">heal your body.</span></h1>
+    <p class="hero-sub">Luminae is a growing library of premium health & wellness ebooks. Beautifully written, deeply researched, and crafted to bring lasting calm and transformation into your life.</p>
+    <div class="hero-actions">
+      <a href="#books" class="btn-primary">Explore the Library</a>
+      <a href="#bundles" class="btn-ghost">View Bundles</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="book-fan">
+      <div class="fan-book"><div class="fan-accent" style="background:#9B72CF"></div><div class="fan-icon">🧠</div><div class="fan-title">Mental Health & Mindfulness</div><div class="fan-divider"></div><div class="fan-by">Luminae</div></div>
+      <div class="fan-book"><div class="fan-accent" style="background:#2ECC71"></div><div class="fan-icon">🥗</div><div class="fan-title">Nutrition & Diet</div><div class="fan-divider"></div><div class="fan-by">Luminae</div></div>
+      <div class="fan-book"><div class="fan-accent" style="background:#FF6B35"></div><div class="fan-icon">🏃</div><div class="fan-title">Fitness & Movement</div><div class="fan-divider"></div><div class="fan-by">Luminae</div></div>
+      <div class="fan-book"><div class="fan-accent" style="background:#4FC3F7"></div><div class="fan-icon">🌙</div><div class="fan-title">Sleep & Recovery</div><div class="fan-divider"></div><div class="fan-by">Luminae</div></div>
+      <div class="fan-book"><div class="fan-accent" style="background:#E91E8C"></div><div class="fan-icon">🌸</div><div class="fan-title">Women's Health & Hormones</div><div class="fan-divider"></div><div class="fan-by">Luminae</div></div>
+    </div>
+    <div class="hero-floating">
+      <div class="float-pill"><div class="pill-icon">📚</div><div class="pill-text"><strong>50+ Books & Growing</strong><span>New titles added monthly</span></div></div>
+      <div class="float-pill"><div class="pill-icon">✦</div><div class="pill-text"><strong>Evidence-Based</strong><span>Science you can trust</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Mental Health</span><span class="marquee-item">Gut Health</span><span class="marquee-item">Longevity</span><span class="marquee-item">Women's Hormones</span><span class="marquee-item">Brain Health</span><span class="marquee-item">Nutrition</span><span class="marquee-item">Sleep Science</span><span class="marquee-item">Anxiety Mastery</span><span class="marquee-item">Biohacking</span><span class="marquee-item">Fitness</span><span class="marquee-item">Mindfulness</span><span class="marquee-item">Heart Health</span>
+    <span class="marquee-item">Mental Health</span><span class="marquee-item">Gut Health</span><span class="marquee-item">Longevity</span><span class="marquee-item">Women's Hormones</span><span class="marquee-item">Brain Health</span><span class="marquee-item">Nutrition</span><span class="marquee-item">Sleep Science</span><span class="marquee-item">Anxiety Mastery</span><span class="marquee-item">Biohacking</span><span class="marquee-item">Fitness</span><span class="marquee-item">Mindfulness</span><span class="marquee-item">Heart Health</span>
+  </div>
+</div>
+
+<div class="promise-strip reveal" id="about">
+  <div class="promise-grid">
+    <div class="promise-item"><div class="promise-num">01</div><h3>Evidence-Based</h3><p>Every book grounded in peer-reviewed research and clinical evidence — not trends or opinions.</p></div>
+    <div class="promise-item"><div class="promise-num">02</div><h3>Always Growing</h3><p>New books added every month. Your library grows with you, forever. No limits, no end.</p></div>
+    <div class="promise-item"><div class="promise-num">03</div><h3>Instant Download</h3><p>Purchase and read within seconds. Beautifully formatted PDFs for every device.</p></div>
+    <div class="promise-item"><div class="promise-num">04</div><h3>Lifetime Access</h3><p>Yours forever. Read offline, share with family, return whenever you need guidance.</p></div>
+  </div>
+</div>
+
+<section class="books-section" id="books">
+  <div class="reveal"><div class="section-eyebrow">The Library</div><h2 class="section-title">50+ titles and <em>growing</em> every month.</h2></div>
+  <div class="filter-bar reveal">
+    <button class="filter-btn active" onclick="filterBooks('all',this)">All Books</button>
+    <button class="filter-btn" onclick="filterBooks('mind',this)">Mind & Mental</button>
+    <button class="filter-btn" onclick="filterBooks('body',this)">Body & Physical</button>
+    <button class="filter-btn" onclick="filterBooks('nutrition',this)">Nutrition</button>
+    <button class="filter-btn" onclick="filterBooks('hormones',this)">Hormones</button>
+    <button class="filter-btn" onclick="filterBooks('lifestyle',this)">Lifestyle</button>
+  </div>
+  <div class="books-grid reveal" id="booksGrid"></div>
+</section>
+
+<div class="growing-banner reveal">
+  <div>
+    <div class="section-eyebrow" style="color:var(--gold-lt)">Unlimited & Expanding</div>
+    <h2>A library with <em>no limits.</em><br>New books, always.</h2>
+    <p>Luminae isn't a fixed collection — it's a living, growing wellness library. New books are released every month across every health topic imaginable. When you invest in Luminae, you invest in a lifetime of growing knowledge.</p>
+  </div>
+  <div class="growing-stats">
+    <div class="grow-stat"><span class="grow-num">50+</span><span class="grow-label">Books Now</span></div>
+    <div class="grow-stat"><span class="grow-num">∞</span><span class="grow-label">Planned</span></div>
+    <div class="grow-stat"><span class="grow-num">Monthly</span><span class="grow-label">New Releases</span></div>
+  </div>
+</div>
+
+<section class="bundles-section" id="bundles">
+  <div class="reveal"><div class="section-eyebrow">Best Value</div><h2 class="section-title">More books, <em>more savings.</em></h2></div>
+  <div class="bundles-grid reveal">
+    <div class="bundle-card">
+      <h3>Build Your Own</h3>
+      <p class="bundle-books">Any 5 books · Your choice</p>
+      <div class="bundle-price">$29.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:var(--soft)">$34.95</span>
+        <span style="background:rgba(74,122,90,.15);color:var(--sage-dk);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $4.96</span>
+      </div>
+      <p class="bundle-save">Pick exactly what you need</p>
+      <ul class="bundle-features">
+        <li>Choose any 5 titles</li>
+        <li>Mix & match freely</li>
+        <li>Perfect starter gift</li>
+        <li>Instant download</li>
+        <li>No expiry ever</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('niche')">Choose My Books</button>
+    </div>
+    <div class="bundle-card featured">
+      <div class="bundle-badge">Most Popular</div>
+      <h3>Starter Collection</h3>
+      <p class="bundle-books">Any 10 books · Perfect beginning</p>
+      <div class="bundle-price">$54.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:rgba(184,168,152,.5)">$69.90</span>
+        <span style="background:rgba(196,146,74,.2);color:var(--gold-lt);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $14.91</span>
+      </div>
+      <p class="bundle-save">Best seller — most customers start here</p>
+      <ul class="bundle-features">
+        <li>Pick any 10 titles you love</li>
+        <li>Every health category covered</li>
+        <li>Instant download all 10</li>
+        <li>Lifetime access forever</li>
+        <li>30-day money back guarantee</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('starter')">Begin Your Journey</button>
+    </div>
+    <div class="bundle-card">
+      <div class="bundle-badge" style="background:var(--sage-dk);color:var(--cream)">Best Value</div>
+      <h3>Mega Bundle</h3>
+      <p class="bundle-books">Any 20 books · Maximum wellness</p>
+      <div class="bundle-price">$99.99</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:.85rem;text-decoration:line-through;color:var(--soft)">$139.80</span>
+        <span style="background:rgba(74,122,90,.15);color:var(--sage-dk);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em">SAVE $39.81</span>
+      </div>
+      <p class="bundle-save">Biggest saving — transform every area of health</p>
+      <ul class="bundle-features">
+        <li>Choose any 20 titles</li>
+        <li>Complete health transformation</li>
+        <li>Instant download all 20</li>
+        <li>Lifetime access forever</li>
+        <li>30-day money back guarantee</li>
+      </ul>
+      <button class="btn-bundle" onclick="showBundle('mega')">Get the Mega Bundle</button>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section">
+  <div class="reveal"><div class="section-eyebrow">Reader Stories</div><h2 class="section-title">Words from those <em>already glowing.</em></h2></div>
+  <div class="testimonials-grid reveal">
+    <div class="testimonial-card"><div class="stars">★★★★★</div><div class="t-quote">"</div><p class="t-text">The Sleep & Recovery book transformed my nights completely. I finally understand why I was exhausted and what to do about it. The science feels warm, not clinical.</p><div class="t-author"><div class="t-avatar">S</div><div><div class="t-name">Sarah M.</div><div class="t-role">Wellness Coach · Kuala Lumpur</div></div></div></div>
+    <div class="testimonial-card"><div class="stars">★★★★★</div><div class="t-quote">"</div><p class="t-text">I bought the Complete Library and it's the best investment I've made in my health. The Gut Health book alone changed my relationship with food entirely.</p><div class="t-author"><div class="t-avatar">R</div><div><div class="t-name">Ravi T.</div><div class="t-role">Engineer · Singapore</div></div></div></div>
+    <div class="testimonial-card"><div class="stars">★★★★★</div><div class="t-quote">"</div><p class="t-text">As a trainer I recommend Luminae to every client. Credible, readable, and actually usable — not just theory but real guidance you can follow tomorrow.</p><div class="t-author"><div class="t-avatar">A</div><div><div class="t-name">Aisha K.</div><div class="t-role">Personal Trainer · Dubai</div></div></div></div>
+  </div>
+</section>
+
+<section class="guarantee-section">
+  <div class="guarantee-visual reveal"><div class="g-badge"><div class="g-num">30</div><p>Day Money-Back<br>Guarantee</p></div></div>
+  <div class="guarantee-text reveal">
+    <div class="section-eyebrow">Zero Risk</div>
+    <h2 class="section-title">Read it. <em>Love it.</em><br>Or your money back.</h2>
+    <p>Every Luminae purchase is protected by a 30-day full refund guarantee. If you're not completely transformed by what you read, contact us and we'll refund you in full — no questions, no forms, no friction.</p>
+    <a href="#bundles" class="btn-primary" style="display:inline-block">Start Reading Today</a>
+  </div>
+</section>
+
+<section class="faq-section" id="faq">
+  <div class="reveal"><div class="section-eyebrow">Questions</div><h2 class="section-title">Everything you <em>need to know.</em></h2></div>
+  <div class="faq-grid reveal">
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What format are the books? <span class="faq-icon">+</span></div><div class="faq-a">All books are beautifully formatted PDFs — compatible with every device and with apps like Apple Books, Adobe Reader, and Google Drive.</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I get my books after buying? <span class="faq-icon">+</span></div><div class="faq-a">Immediately after purchase a download link arrives in your inbox. Most readers are inside their first book within 2 minutes. Download as many times as you like.</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Does the library really keep growing? <span class="faq-icon">+</span></div><div class="faq-a">Yes — new Luminae books are released every month. Complete Library customers receive every new title automatically. It truly is an unlimited, lifelong collection.</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Are these books suitable for beginners? <span class="faq-icon">+</span></div><div class="faq-a">Absolutely. Every book is warm, accessible, and empowering for readers with no prior health knowledge — while being substantive enough for health professionals too.</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I read offline? <span class="faq-icon">+</span></div><div class="faq-a">Yes. Once downloaded your PDFs live on your device. Read anywhere — no internet needed, ever.</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Do these replace medical advice? <span class="faq-icon">+</span></div><div class="faq-a">Luminae books educate and empower, not replace your healthcare provider. We always encourage consulting a doctor before significant lifestyle changes.</div></div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <div class="section-eyebrow">Begin Today</div>
+  <h2>Your healthiest, most <em>luminous</em> life starts here.</h2>
+  <p>An ever-growing library of wellness wisdom, waiting for you. Pick one book or get them all — your journey begins the moment you say yes.</p>
+  <div class="cta-row">
+    <a href="#bundles" class="btn-primary">Get the Complete Library</a>
+    <a href="#books" class="btn-ghost">Browse All Books</a>
+  </div>
+  <div style="margin-top:52px;padding-top:44px;border-top:1px solid rgba(196,146,74,.12)">
+    <p style="font-size:.82rem;color:rgba(250,240,232,.4);margin-bottom:18px;letter-spacing:.1em;text-transform:uppercase">Stay updated · New books every month</p>
+    <div class="newsletter-form">
+      <input class="newsletter-input" type="email" placeholder="Your email address">
+      <button class="newsletter-btn">Notify Me</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="#" class="nav-logo">Luminae<span>.</span></a>
+  <p>© 2025 Luminae Health Library. All rights reserved.</p>
+  <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a><a href="#">Refund Policy</a></div>
+</footer>
+
+<div class="modal-overlay" id="bookModal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('bookModal').classList.remove('open')">×</button>
+    <p class="modal-eyebrow" id="modalEyebrow"></p>
+    <h3 id="modalTitle"></h3>
+    <p class="modal-tagline" id="modalTagline"></p>
+    <p class="modal-desc" id="modalDesc"></p>
+    <div class="modal-price-row"><span class="modal-price" id="modalPrice"></span><span class="modal-detail">PDF · 100 pages · Instant download</span></div>
+    <button class="btn-primary" id="modalBtn" style="width:100%;display:block;text-align:center;border:none;font-family:'DM Sans',sans-serif">Purchase Now</button>
+  </div>
+</div>
+<script>
+// ── BASE BOOKS (50 books) ──
+const BASE_BOOKS=[
+  {id:1,title:"Mental Health & Mindfulness",tagline:"Rewire Your Mind. Reclaim Your Peace.",icon:"🧠",color:"#0A0612",accent:"#9B72CF",cat:"mind",price:"$6.99",desc:"A powerful guide to understanding and improving mental wellbeing through evidence-based mindfulness, meditation, and cognitive techniques. Covers anxiety, CBT, breathwork, digital wellness, and building lasting emotional resilience."},
+  {id:2,title:"Nutrition & Diet",tagline:"Fuel Your Body. Nourish Your Life.",icon:"🥗",color:"#050F08",accent:"#2ECC71",cat:"nutrition",price:"$6.99",desc:"Everything you need to eat for optimal health — macronutrients, micronutrients, gut health, anti-inflammatory eating, meal planning, and mindful nutrition."},
+  {id:3,title:"Fitness & Movement",tagline:"Move with Purpose. Train for Life.",icon:"🏃",color:"#150800",accent:"#FF6B35",cat:"body",price:"$6.99",desc:"Your complete guide to building a sustainable fitness lifestyle covering cardio, strength training, flexibility, recovery, and the mental health benefits of movement."},
+  {id:4,title:"Sleep & Recovery",tagline:"Rest Deeply. Recover Completely.",icon:"🌙",color:"#010810",accent:"#4FC3F7",cat:"lifestyle",price:"$6.99",desc:"Unlock the transformative power of quality sleep and strategic recovery. Covers circadian rhythms, sleep disorders, sleep hygiene, and building your perfect sleep environment."},
+  {id:5,title:"Holistic & Natural Healing",tagline:"Heal from Within. Thrive Naturally.",icon:"🌿",color:"#150A00",accent:"#F4A261",cat:"lifestyle",price:"$6.99",desc:"An integrative exploration of herbal medicine, aromatherapy, Ayurveda, Traditional Chinese Medicine, and energy healing."},
+  {id:6,title:"Gut Health & Digestion",tagline:"Heal Your Gut. Transform Your Health.",icon:"⚗️",color:"#120800",accent:"#E67E22",cat:"nutrition",price:"$7.99",desc:"Discover how your gut influences immunity, mood, and total body health. Covers the microbiome, leaky gut, IBS, probiotics, and a comprehensive gut-healing protocol."},
+  {id:7,title:"Women's Health & Hormones",tagline:"Balance Your Hormones. Own Your Vitality.",icon:"🌸",color:"#150008",accent:"#E91E8C",cat:"hormones",price:"$7.99",desc:"A comprehensive guide to female hormonal health covering the menstrual cycle, PCOS, endometriosis, fertility, thyroid, perimenopause, and thriving at every stage of womanhood."},
+  {id:8,title:"Stress & Burnout Recovery",tagline:"Release the Pressure. Restore Your Energy.",icon:"🌊",color:"#010E12",accent:"#26C6DA",cat:"mind",price:"$7.99",desc:"A science-backed guide to recognising, recovering from, and preventing burnout. Covers the HPA axis, nervous system regulation, boundaries, rest, and rebuilding sustainable vitality."},
+  {id:9,title:"Healthy Ageing",tagline:"Age with Grace. Live with Vitality.",icon:"🍃",color:"#020D03",accent:"#66BB6A",cat:"body",price:"$7.99",desc:"Evidence-based strategies for ageing well — longevity nutrition, brain health, bone and muscle preservation, and the social factors that predict long vibrant life."},
+  {id:10,title:"The Complete Wellness Lifestyle",tagline:"Integrate Everything. Live Your Best Life.",icon:"⭐",color:"#0F0D00",accent:"#FFD700",cat:"lifestyle",price:"$7.99",desc:"The master integration guide — weaving together nutrition, movement, sleep, relationships, purpose, and environmental design into one personalised wellness lifestyle."},
+  {id:11,title:"Heart Health",tagline:"Protect Your Heart. Extend Your Life.",icon:"❤️",color:"#130000",accent:"#E53935",cat:"body",price:"$7.99",desc:"Everything needed to protect your cardiovascular system — the DASH diet, heart-rate training, stress management, medications, and a lifelong heart-healthy lifestyle."},
+  {id:12,title:"Diabetes Prevention",tagline:"Balance Your Blood Sugar. Reclaim Your Energy.",icon:"⚡",color:"#001215",accent:"#00ACC1",cat:"nutrition",price:"$7.99",desc:"A clear guide to preventing and managing type 2 diabetes through blood sugar management, insulin sensitivity, targeted nutrition, and lifestyle medicine."},
+  {id:13,title:"Cancer Prevention",tagline:"Reduce Your Risk. Strengthen Your Defences.",icon:"🛡️",color:"#0D0015",accent:"#7B1FA2",cat:"body",price:"$8.99",desc:"Research-grounded strategies for reducing cancer risk through diet, exercise, toxin avoidance, and supporting the body's natural defence systems."},
+  {id:14,title:"Immune System Mastery",tagline:"Strengthen Your Defences. Fight Back Naturally.",icon:"🔋",color:"#010F02",accent:"#43A047",cat:"body",price:"$7.99",desc:"A complete guide to optimising your immune system through nutrition, sleep, exercise, stress management, and gut health."},
+  {id:15,title:"Bone & Joint Health",tagline:"Build Strength from the Inside Out.",icon:"🦴",color:"#080C0E",accent:"#78909C",cat:"body",price:"$7.99",desc:"Protect bone density, prevent osteoporosis, manage arthritis, and keep joints healthy through targeted nutrition and weight-bearing exercise."},
+  {id:16,title:"Brain Health & Cognition",tagline:"Sharpen Your Mind. Future-Proof Your Brain.",icon:"💡",color:"#000A18",accent:"#1565C0",cat:"mind",price:"$8.99",desc:"Optimise brain performance and protect against cognitive decline through the MIND diet, exercise, sleep, and evidence-based neuroprotective practices."},
+  {id:17,title:"Respiratory Health",tagline:"Breathe Better. Live Fully.",icon:"💨",color:"#011210",accent:"#26A69A",cat:"body",price:"$7.99",desc:"A complete guide to lung health, breathing optimisation, and respiratory conditions — from asthma to advanced breathwork and air quality strategies."},
+  {id:18,title:"Skin Health & Beauty",tagline:"Glow from Within. Nourish Your Skin.",icon:"✨",color:"#150008",accent:"#F06292",cat:"hormones",price:"$7.99",desc:"A science-backed inside-out approach to radiant skin — the skin microbiome, nutrition, hormonal acne, active ingredients, and natural beauty strategies."},
+  {id:19,title:"Eye Health & Vision",tagline:"See Clearly. Protect Your Sight for Life.",icon:"👁️",color:"#000A14",accent:"#1E88E5",cat:"body",price:"$7.99",desc:"Comprehensive eye health guidance covering nutrition for vision, digital eye strain, age-related conditions, and sight-preserving screenings."},
+  {id:20,title:"Dental & Oral Health",tagline:"A Healthy Mouth. A Healthier Body.",icon:"🦷",color:"#001215",accent:"#00BCD4",cat:"body",price:"$7.99",desc:"Explore the mouth-body connection, the oral microbiome, and advanced dental hygiene — including the links between oral bacteria and heart disease."},
+  {id:21,title:"Weight Loss Science",tagline:"Understand Your Body. Lose Weight for Good.",icon:"⚖️",color:"#140500",accent:"#FF7043",cat:"nutrition",price:"$8.99",desc:"The science behind sustainable weight loss — set point theory, hormonal regulation, adaptive thermogenesis, and working with your biology not against it."},
+  {id:22,title:"Chronic Pain Management",tagline:"Break the Pain Cycle. Reclaim Your Life.",icon:"💙",color:"#050510",accent:"#5C6BC0",cat:"mind",price:"$8.99",desc:"A compassionate guide to chronic pain through movement, mindfulness, nutrition, sleep, and evidence-based therapies."},
+  {id:23,title:"Men's Health & Vitality",tagline:"Own Your Health. Live with Purpose.",icon:"💪",color:"#000A14",accent:"#1976D2",cat:"hormones",price:"$7.99",desc:"A comprehensive guide to men's health — testosterone, prostate health, cardiovascular risk, male mental health, and lifestyle strategies for every age."},
+  {id:24,title:"Children's Health",tagline:"Raise Healthy Kids. Build Healthy Futures.",icon:"🌟",color:"#141000",accent:"#FFB300",cat:"lifestyle",price:"$7.99",desc:"Evidence-based parenting guidance on nutrition, movement, sleep, screen time, mental health, and habits that build lifelong wellbeing."},
+  {id:25,title:"Pregnancy & Postnatal Health",tagline:"Nurture Yourself. Welcome New Life.",icon:"🤱",color:"#140008",accent:"#EC407A",cat:"hormones",price:"$8.99",desc:"A compassionate guide through pregnancy and the postnatal period — prenatal nutrition, movement, mental health, breastfeeding, and the fourth trimester."},
+  {id:26,title:"Addiction Recovery",tagline:"Break Free. Rebuild Your Life.",icon:"🌅",color:"#001210",accent:"#00897B",cat:"mind",price:"$8.99",desc:"A holistic guide to understanding addiction, navigating recovery, managing mental health in sobriety, and building a meaningful sustainable life."},
+  {id:27,title:"Thyroid Health",tagline:"Balance Your Metabolism. Reclaim Your Energy.",icon:"🦋",color:"#120A00",accent:"#F57F17",cat:"hormones",price:"$7.99",desc:"A thorough guide to thyroid function — hypothyroidism, hyperthyroidism, Hashimoto's, and Graves' disease — with nutritional and lifestyle support."},
+  {id:28,title:"The Gut Healing Diet",tagline:"Transform Your Gut. Transform Your Life.",icon:"🌱",color:"#0F0A08",accent:"#8D6E63",cat:"nutrition",price:"$8.99",desc:"Step-by-step dietary protocol for healing the gut using the 4R Framework with guidance on elimination diets and long-term microbiome care."},
+  {id:29,title:"Anxiety Mastery",tagline:"Quiet the Noise. Find Your Calm.",icon:"🕊️",color:"#08051A",accent:"#7E57C2",cat:"mind",price:"$8.99",desc:"A complete guide to overcoming anxiety — CBT, breathwork, nervous system regulation, nutritional approaches, and building lasting calm."},
+  {id:30,title:"Emotional Intelligence",tagline:"Master Your Emotions. Elevate Your Life.",icon:"🧡",color:"#140900",accent:"#FF8F00",cat:"mind",price:"$7.99",desc:"Develop all five components of emotional intelligence for better relationships, leadership, and mental health."},
+  {id:31,title:"Plant-Based Living",tagline:"Eat Plants. Heal Your Body. Help the Planet.",icon:"🌾",color:"#060F00",accent:"#558B2F",cat:"nutrition",price:"$7.99",desc:"A practical guide to plant-based eating — complete nutrition, meal planning, athletic performance, and long-term sustainability."},
+  {id:32,title:"Fasting & Longevity",tagline:"Reset Your Cells. Extend Your Healthspan.",icon:"⏰",color:"#001215",accent:"#00838F",cat:"lifestyle",price:"$8.99",desc:"Evidence-based exploration of intermittent fasting, autophagy, cellular repair, and the longevity science behind fasting."},
+  {id:33,title:"The Microbiome Revolution",tagline:"Trillions of Allies. One Healthy You.",icon:"🔬",color:"#001210",accent:"#00695C",cat:"nutrition",price:"$8.99",desc:"A deep dive into the human microbiome — how to nurture it through diet, lifestyle, and targeted supplementation for whole-body health."},
+  {id:34,title:"Posture & Movement",tagline:"Stand Tall. Move Well. Feel Better.",icon:"🏛️",color:"#070C0E",accent:"#546E7A",cat:"body",price:"$7.99",desc:"Correct posture, improve functional movement, and eliminate pain through corrective exercises, ergonomic design, and movement intelligence."},
+  {id:35,title:"Energy & Fatigue",tagline:"Unlock Limitless Energy. Beat Fatigue for Good.",icon:"☀️",color:"#0F0D00",accent:"#FDD835",cat:"lifestyle",price:"$8.99",desc:"Understand and resolve chronic fatigue through mitochondrial support, hormonal optimisation, and rebuilding sustainable daily vitality."},
+  {id:36,title:"Mindful Living",tagline:"Be Present. Live Intentionally. Thrive.",icon:"🎋",color:"#040F0E",accent:"#80CBC4",cat:"mind",price:"$7.99",desc:"Bring mindfulness into every dimension of daily life — eating, relationships, work, technology, and emotions."},
+  {id:37,title:"Sports Nutrition",tagline:"Fuel Performance. Accelerate Recovery.",icon:"🏅",color:"#140400",accent:"#FF5722",cat:"nutrition",price:"$8.99",desc:"A complete sports nutrition guide covering fuelling, hydration, protein timing, carbohydrate periodisation, and supplements."},
+  {id:38,title:"Spiritual Wellness",tagline:"Connect to What Matters. Live with Purpose.",icon:"✴️",color:"#090512",accent:"#9575CD",cat:"lifestyle",price:"$7.99",desc:"A thoughtful exploration of spirituality's health effects — gratitude, purpose, compassion, ritual, community, and meaning."},
+  {id:39,title:"Environmental Health",tagline:"Clean Your World. Protect Your Body.",icon:"🌍",color:"#030A00",accent:"#33691E",cat:"lifestyle",price:"$8.99",desc:"Reduce exposure to environmental health threats — air quality, water, endocrine disruptors, and building a truly healthy home."},
+  {id:40,title:"Financial Wellness",tagline:"Money Mastery for a Healthier Life.",icon:"💛",color:"#0F0C00",accent:"#C0A000",cat:"lifestyle",price:"$7.99",desc:"The deep connection between financial wellbeing and health — with practical strategies for building security and reducing money stress."},
+  {id:41,title:"Flexibility & Yoga",tagline:"Bend Without Breaking. Flow with Life.",icon:"🌺",color:"#0E0008",accent:"#AD1457",cat:"body",price:"$7.99",desc:"A complete guide to flexibility and yoga — fascia, major styles, yoga for pain and mental health, and joyful movement for life."},
+  {id:42,title:"High Performance Habits",tagline:"Optimise Your Life. Achieve Your Potential.",icon:"🚀",color:"#030520",accent:"#283593",cat:"lifestyle",price:"$8.99",desc:"The neuroscience of peak performance — morning routines, deep work, flow states, cognitive nutrition, and sustainable excellence."},
+  {id:43,title:"The Gut-Brain Connection",tagline:"Heal Your Gut. Transform Your Mind.",icon:"🧬",color:"#0C0704",accent:"#5D4037",cat:"mind",price:"$9.99",desc:"The bidirectional gut-brain axis — how gut bacteria produce neurotransmitters and how nutritional psychiatry offers new hope for mental health."},
+  {id:44,title:"Longevity & Biohacking",tagline:"Hack Your Biology. Live Longer. Live Better.",icon:"🔮",color:"#001512",accent:"#00BFA5",cat:"lifestyle",price:"$9.99",desc:"Cutting-edge longevity science and biohacking — NAD+, autophagy, wearables, hormesis, and personalised health optimisation."},
+  {id:45,title:"Trauma & Healing",tagline:"Acknowledge the Wound. Begin the Healing.",icon:"💜",color:"#0A0012",accent:"#6A1B9A",cat:"mind",price:"$9.99",desc:"A compassionate guide to trauma science and healing — EMDR, somatic experiencing, nervous system repair, and post-traumatic growth."},
+  {id:46,title:"Cooking for Health",tagline:"Transform Your Kitchen. Transform Your Health.",icon:"🍳",color:"#140400",accent:"#E64A19",cat:"nutrition",price:"$7.99",desc:"Transform your kitchen into a healing pharmacy — anti-inflammatory cooking, fermentation, meal prep, and herbs and spices as medicine."},
+  {id:47,title:"Perimenopause & Menopause",tagline:"Navigate the Change. Thrive on the Other Side.",icon:"🌙",color:"#14000A",accent:"#C2185B",cat:"hormones",price:"$9.99",desc:"An empowering guide to perimenopause and menopause — HRT, natural alternatives, hot flushes, sleep, mood, bone health, and reclaiming vitality."},
+  {id:48,title:"Breaking Sugar Addiction",tagline:"Free Yourself from Sugar. Reclaim Your Health.",icon:"🍯",color:"#120C00",accent:"#F9A825",cat:"nutrition",price:"$7.99",desc:"The neuroscience of sugar addiction and a compassionate protocol for reducing sugar and rebuilding a healthy relationship with food."},
+  {id:49,title:"Work-Life Balance",tagline:"Boundaries that Protect. A Life that Fulfils.",icon:"⚖️",color:"#001210",accent:"#00796B",cat:"lifestyle",price:"$7.99",desc:"A practical guide to work-life harmony through boundary-setting, time management, and designing a life that energises rather than depletes."},
+  {id:50,title:"The Complete Body Reset",tagline:"Start Over. Transform Completely. Thrive.",icon:"🔄",color:"#0F0D00",accent:"#FFD700",cat:"lifestyle",price:"$9.99",desc:"A comprehensive 30-90 day reset — detoxification, gut healing, hormonal rebalancing, sleep restoration, and mindset transformation."},
+];
+
+const COVER_THEMES=[
+  {color:"#0A0612",accent:"#9B72CF"},{color:"#050F08",accent:"#2ECC71"},
+  {color:"#150800",accent:"#FF6B35"},{color:"#010810",accent:"#4FC3F7"},
+  {color:"#150008",accent:"#E91E8C"},{color:"#001215",accent:"#00ACC1"},
+  {color:"#0D0015",accent:"#7B1FA2"},{color:"#000A18",accent:"#1565C0"},
+  {color:"#011210",accent:"#26A69A"},{color:"#001210",accent:"#00695C"},
+  {color:"#0A0012",accent:"#6A1B9A"},{color:"#140400",accent:"#E64A19"},
+  {color:"#14000A",accent:"#C2185B"},{color:"#120C00",accent:"#F9A825"},
+  {color:"#030520",accent:"#283593"},{color:"#001512",accent:"#00BFA5"},
+];
+
+const ADMIN_PASS = "luminae2025";
+const STORAGE_KEY = "luminae_books_v1";
+
+function getCustomBooks(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"); }catch(e){ return []; }
+}
+function saveCustomBooks(books){ localStorage.setItem(STORAGE_KEY, JSON.stringify(books)); }
+function getAllBooks(){ return [...BASE_BOOKS, ...getCustomBooks()]; }
+
+function renderBooks(filter='all'){
+  const grid = document.getElementById('booksGrid');
+  const all = getAllBooks();
+  const filtered = filter==='all' ? all : all.filter(b=>b.cat===filter);
+  const countEl = document.getElementById('bookCountDyn');
+  if(countEl) countEl.textContent = all.length + '+';
+  grid.innerHTML = filtered.map(b=>`
+    <div class="book-item" onclick="openBook(${b.id})">
+      <div class="book-cover" style="background:linear-gradient(160deg,${b.color} 0%,${b.color}ee 55%,${b.accent}22 100%)">
+        <div class="book-cover-inner">
+          <span class="cover-num">${String(b.id).padStart(3,'0')}</span>
+          <div class="cover-icon">${b.icon||'📖'}</div>
+          <div class="cover-title">${b.title}</div>
+          <div class="cover-line"></div>
+          <div class="cover-byline">Luminae</div>
+        </div>
+      </div>
+      <div class="book-meta">
+        <div class="book-title-text">${b.title}</div>
+        <div class="book-price-row">
+          <span class="book-price">${b.price}</span>
+          <span class="book-pages">100 pages</span>
+        </div>
+        <button class="btn-buy">Buy Now</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterBooks(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBooks(cat);
+}
+
+function openBook(id){
+  const b = getAllBooks().find(b=>b.id===id);
+  if(!b) return;
+  document.getElementById('modalEyebrow').textContent=`Volume ${String(b.id).padStart(3,'0')}  ·  Luminae Health Library`;
+  document.getElementById('modalTitle').textContent=b.title;
+  document.getElementById('modalTagline').textContent='"'+b.tagline+'"';
+  document.getElementById('modalDesc').textContent=b.desc;
+  document.getElementById('modalPrice').textContent=b.price;
+  document.getElementById('modalBtn').textContent='Purchase — '+b.price;
+  document.getElementById('bookModal').classList.add('open');
+}
+function closeModal(e){if(e.target.id==='bookModal')document.getElementById('bookModal').classList.remove('open');}
+
+function showBundle(type){
+  const bundles={
+    starter:{title:"Starter Collection",price:"$29.99",desc:"10 beautifully curated books to begin your Luminae journey — mental health, nutrition, fitness, sleep, natural healing, gut health, women's health, stress recovery, healthy ageing, and complete wellness. Save $20 vs individual."},
+    complete:{title:"Complete Library — All Books Forever",price:"$99.99",desc:"Every single Luminae book — now and forever. All current titles plus every new book released going forward. One purchase, unlimited lifetime access. The most generous offer we make."},
+    niche:{title:"Build Your Own — Any 5 Books",price:"$29.99",desc:"Choose any 5 titles from the Luminae library. Email your selections after purchasing and receive your personalised bundle instantly. A perfect thoughtful gift."},
+  };
+  const b=bundles[type];
+  document.getElementById('modalEyebrow').textContent='Bundle · Luminae Health Library';
+  document.getElementById('modalTitle').textContent=b.title;
+  document.getElementById('modalTagline').textContent='✦ Instant Download  ✦  Lifetime Access  ✦  30-Day Guarantee';
+  document.getElementById('modalDesc').textContent=b.desc;
+  document.getElementById('modalPrice').textContent=b.price;
+  document.getElementById('modalBtn').textContent='Get This Bundle — '+b.price;
+  document.getElementById('bookModal').classList.add('open');
+}
+function toggleFaq(el){el.classList.toggle('open');}
+
+// ── ADMIN ──
+let adminUnlocked = false;
+
+function openAdmin(){
+  if(!adminUnlocked){
+    const pw = prompt('Enter admin password:');
+    if(pw !== ADMIN_PASS){ alert('Incorrect password.'); return; }
+    adminUnlocked = true;
+  }
+  document.getElementById('adminOverlay').classList.add('open');
+  renderAdminList();
+  updateThemePreview();
+}
+function closeAdminPanel(){
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+
+function updateThemePreview(){
+  const idx = parseInt(document.getElementById('adminTheme').value);
+  const theme = COVER_THEMES[idx];
+  const icon = document.getElementById('adminIcon').value||'📖';
+  const title = document.getElementById('adminTitle').value||'Book Title';
+  const prev = document.getElementById('coverPreview');
+  prev.style.background = `linear-gradient(160deg,${theme.color} 0%,${theme.color}ee 55%,${theme.accent}22 100%)`;
+  prev.querySelector('.prev-icon').textContent = icon;
+  prev.querySelector('.prev-title').textContent = title;
+  prev.querySelector('.prev-bar').style.background = theme.accent;
+}
+
+function addBook(){
+  const title = document.getElementById('adminTitle').value.trim();
+  const tagline = document.getElementById('adminTagline').value.trim();
+  const desc = document.getElementById('adminDesc').value.trim();
+  const price = document.getElementById('adminPrice').value;
+  const cat = document.getElementById('adminCat').value;
+  const icon = document.getElementById('adminIcon').value.trim()||'📖';
+  const themeIdx = parseInt(document.getElementById('adminTheme').value);
+  const theme = COVER_THEMES[themeIdx];
+
+  if(!title||!tagline||!desc){ alert('Please fill in Title, Tagline, and Description.'); return; }
+
+  const custom = getCustomBooks();
+  const newId = Date.now();
+  custom.push({ id:newId, title, tagline, desc, price, cat, icon, color:theme.color, accent:theme.accent });
+  saveCustomBooks(custom);
+
+  // Reset form
+  ['adminTitle','adminTagline','adminDesc','adminIcon'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('adminPrice').value='$7.99';
+  document.getElementById('adminCat').value='lifestyle';
+  document.getElementById('adminTheme').value='0';
+  updateThemePreview();
+
+  renderAdminList();
+  renderBooks();
+
+  const countEl = document.getElementById('bookCountDyn');
+  if(countEl) countEl.textContent = getAllBooks().length + '+';
+
+  showToast('✦ Book added! "'+title+'" is now live on your store.');
+}
+
+function deleteBook(id){
+  if(!confirm('Delete this book from your store?')) return;
+  const custom = getCustomBooks().filter(b=>b.id!==id);
+  saveCustomBooks(custom);
+  renderAdminList();
+  renderBooks();
+}
+
+function renderAdminList(){
+  const custom = getCustomBooks();
+  const el = document.getElementById('adminBookList');
+  if(custom.length===0){
+    document.getElementById('customCount').textContent = 0;
+    el.innerHTML='<div style="color:rgba(250,240,232,.4);font-size:.85rem;text-align:center;padding:20px 0">No custom books yet. Add your first one above!</div>';
+    return;
+  }
+  document.getElementById('customCount').textContent = custom.length;
+  el.innerHTML = custom.map(b=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(196,146,74,.15)">
+      <div style="width:36px;height:50px;border-radius:3px 6px 6px 3px;background:linear-gradient(160deg,${b.color},${b.accent}44);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${b.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.88rem;font-weight:600;color:rgba(250,240,232,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.title}</div>
+        <div style="font-size:.75rem;color:rgba(250,240,232,.4)">${b.cat} · ${b.price}</div>
+      </div>
+      <button onclick="deleteBook(${b.id})" style="background:rgba(255,100,100,.15);border:1px solid rgba(255,100,100,.3);color:#ff8080;padding:5px 12px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif">Remove</button>
+    </div>`).join('');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+renderBooks();
+</script>
+
+<!-- ADMIN PANEL STYLES -->
+<style>
+.admin-fab{position:fixed;bottom:28px;right:28px;z-index:500;width:52px;height:52px;border-radius:50%;background:var(--sage-dk);color:var(--cream);border:none;font-size:1.3rem;cursor:pointer;box-shadow:0 8px 24px rgba(74,122,90,.4);transition:all .25s;display:flex;align-items:center;justify-content:center}
+.admin-fab:hover{background:var(--gold);transform:scale(1.1)}
+.admin-overlay{position:fixed;inset:0;z-index:1001;background:rgba(42,34,24,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.admin-overlay.open{opacity:1;pointer-events:all}
+.admin-panel{background:#1A1408;border:1px solid rgba(196,146,74,.25);border-radius:20px;width:94%;max-width:760px;max-height:90vh;overflow-y:auto;padding:36px;position:relative}
+.admin-panel::-webkit-scrollbar{width:4px}
+.admin-panel::-webkit-scrollbar-thumb{background:rgba(196,146,74,.3);border-radius:2px}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.admin-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:rgba(250,240,232,.9)}
+.admin-title span{color:var(--gold);font-style:italic}
+.admin-close{background:none;border:none;font-size:1.5rem;color:rgba(250,240,232,.4);cursor:pointer;transition:color .2s}
+.admin-close:hover{color:rgba(250,240,232,.9)}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.admin-field label{display:block;font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(196,146,74,.8);margin-bottom:6px}
+.admin-field input,.admin-field select,.admin-field textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(196,146,74,.2);border-radius:8px;padding:10px 14px;font-size:.88rem;color:rgba(250,240,232,.9);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.admin-field input:focus,.admin-field select:focus,.admin-field textarea:focus{border-color:var(--gold)}
+.admin-field textarea{resize:vertical;min-height:90px;line-height:1.6}
+.admin-field select option{background:#1A1408;color:rgba(250,240,232,.9)}
+.admin-full{grid-column:span 2}
+.cover-preview-wrap{grid-column:span 2;display:flex;align-items:center;gap:20px}
+.cover-preview{width:100px;height:140px;border-radius:3px 10px 10px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:background .4s}
+.cover-preview::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,.3);border-radius:3px 0 0 3px}
+.prev-icon{font-size:1.6rem;margin-bottom:8px}
+.prev-title{font-family:'Playfair Display',serif;font-size:.6rem;font-weight:500;color:#fff;line-height:1.3;margin-bottom:6px}
+.prev-bar{width:20px;height:1px;margin:0 auto 5px;opacity:.7}
+.prev-by{font-size:.45rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,192,138,.8)}
+.cover-preview-info{font-size:.82rem;color:rgba(250,240,232,.5);line-height:1.8}
+.btn-add{width:100%;padding:14px;background:var(--gold);color:#1A1408;border:none;border-radius:10px;font-size:.9rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;margin-bottom:24px}
+.btn-add:hover{background:var(--gold-lt);transform:translateY(-1px)}
+.admin-divider{border:none;border-top:1px solid rgba(196,146,74,.15);margin:4px 0 20px}
+.admin-list-title{font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,146,74,.7);margin-bottom:12px}
+.toast{position:fixed;bottom:100px;right:28px;z-index:9999;background:var(--sage-dk);color:var(--cream);padding:14px 22px;border-radius:10px;font-size:.88rem;font-weight:500;box-shadow:0 8px 32px rgba(74,122,90,.4);transform:translateY(20px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:600px){.admin-grid{grid-template-columns:1fr}.admin-full{grid-column:span 1}.cover-preview-wrap{grid-column:span 1}}
+</style>
+
+<!-- ADMIN FAB BUTTON -->
+<button class="admin-fab" onclick="openAdmin()" title="Add New Book">＋</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdminPanel()">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <div class="admin-title">Luminae <span>Book Manager</span></div>
+      <button class="admin-close" onclick="closeAdminPanel()">×</button>
+    </div>
+
+    <div class="admin-grid">
+      <div class="admin-field admin-full">
+        <label>Book Title *</label>
+        <input id="adminTitle" type="text" placeholder="e.g. The Hormone Reset for Women Over 40" oninput="updateThemePreview()">
+      </div>
+      <div class="admin-field admin-full">
+        <label>Tagline * (short punchy sentence)</label>
+        <input id="adminTagline" type="text" placeholder="e.g. Reclaim Your Energy. Rebalance Your Life.">
+      </div>
+      <div class="admin-field admin-full">
+        <label>Description * (2–4 sentences about what's inside)</label>
+        <textarea id="adminDesc" placeholder="A comprehensive guide to..."></textarea>
+      </div>
+      <div class="admin-field">
+        <label>Category</label>
+        <select id="adminCat">
+          <option value="mind">Mind & Mental</option>
+          <option value="body">Body & Physical</option>
+          <option value="nutrition">Nutrition</option>
+          <option value="hormones">Hormones</option>
+          <option value="lifestyle" selected>Lifestyle</option>
+        </select>
+      </div>
+      <div class="admin-field">
+        <label>Price</label>
+        <select id="adminPrice">
+          <option>$6.99</option><option>$7.99</option>
+          <option selected>$8.99</option><option>$9.99</option><option>$12.99</option>
+        </select>
+      </div>
+      <div class="admin-field">
+        <label>Emoji Icon</label>
+        <input id="adminIcon" type="text" placeholder="🌿" maxlength="4" oninput="updateThemePreview()">
+      </div>
+      <div class="admin-field">
+        <label>Cover Colour Theme</label>
+        <select id="adminTheme" onchange="updateThemePreview()">
+          <option value="0">Deep Purple</option>
+          <option value="1">Forest Green</option>
+          <option value="2">Sunset Orange</option>
+          <option value="3">Sky Blue</option>
+          <option value="4">Rose Pink</option>
+          <option value="5">Ocean Teal</option>
+          <option value="6">Royal Violet</option>
+          <option value="7">Navy Blue</option>
+          <option value="8">Jade Green</option>
+          <option value="9">Emerald</option>
+          <option value="10">Dark Plum</option>
+          <option value="11">Burnt Orange</option>
+          <option value="12">Crimson Rose</option>
+          <option value="13">Amber Gold</option>
+          <option value="14">Midnight Blue</option>
+          <option value="15">Mint Teal</option>
+        </select>
+      </div>
+      <div class="cover-preview-wrap">
+        <div class="cover-preview" id="coverPreview" style="background:linear-gradient(160deg,#0A0612,#9B72CF22)">
+          <div class="prev-icon">📖</div>
+          <div class="prev-title">Book Title</div>
+          <div class="prev-bar" style="background:#9B72CF"></div>
+          <div class="prev-by">Luminae</div>
+        </div>
+        <div class="cover-preview-info">
+          <strong style="color:rgba(250,240,232,.7);display:block;margin-bottom:6px">Cover Preview</strong>
+          Fill in the title and icon to see your cover. Choose a colour theme that matches your topic.
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-add" onclick="addBook()">✦ Add Book to Store</button>
+
+    <hr class="admin-divider">
+    <div class="admin-list-title">Your Added Books (<span id="customCount">0</span>)</div>
+    <div id="adminBookList"></div>
+  </div>
+</div>
+
+</body></html>
