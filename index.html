@@ -5,176 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luminae — Health Library</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
 
-// ── SUPABASE AUTH ──
-const SUPABASE_URL = 'https://cnuvtnnemwjfjafllgbh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNudXZ0bm5lbXdqZmphZmxsZ2JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4OTIyNTMsImV4cCI6MjA4ODQ2ODI1M30.gm7mprHxMUqmD1kO5AVnc3cVYEFkKvGex2an4Wfm0eQ';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-var currentUser = null;
-
-// Init — check if already logged in
-async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if(session && session.user) {
-    currentUser = session.user;
-    onLoggedIn(session.user);
-  } else {
-    onLoggedOut();
-  }
-  supabase.auth.onAuthStateChange(function(event, session) {
-    if(session && session.user) { currentUser = session.user; onLoggedIn(session.user); }
-    else { currentUser = null; onLoggedOut(); }
-  });
-}
-
-function onLoggedIn(user) {
-  var email = user.email;
-  var shortEmail = email.length > 18 ? email.substring(0,15)+'...' : email;
-  document.getElementById('navAuthArea').innerHTML =
-    '<span class="nav-user"><span class="nav-user-email">' + shortEmail + '</span>' +
-    '<button class="nav-signout" onclick="doSignout()">Sign out</button>' +
-    '<button class="nav-library-btn" onclick="openLibrary()">My Library</button></span>';
-  var mobileLib = document.getElementById('mobileLibBtn');
-  var mobileAuth = document.getElementById('mobileAuthBtn');
-  if(mobileLib) mobileLib.style.display = '';
-  if(mobileAuth) mobileAuth.style.display = 'none';
-  // Load purchased books from Supabase
-  loadPurchases(user.id);
-}
-
-function onLoggedOut() {
-  document.getElementById('navAuthArea').innerHTML =
-    '<button class="nav-signin-btn" onclick="openAuth(\'signup\')">Sign Up / Login</button>';
-  var mobileLib = document.getElementById('mobileLibBtn');
-  var mobileAuth = document.getElementById('mobileAuthBtn');
-  if(mobileLib) mobileLib.style.display = 'none';
-  if(mobileAuth) { mobileAuth.style.display = ''; mobileAuth.textContent = 'Sign Up'; }
-  purchased = [];
-  renderBooks();
-}
-
-async function loadPurchases(userId) {
-  try {
-    var res = await supabase.from('purchases').select('book_ids').eq('user_id', userId).single();
-    if(res.data && res.data.book_ids) {
-      purchased = res.data.book_ids;
-    } else {
-      purchased = [];
-    }
-  } catch(e) { purchased = []; }
-  renderBooks();
-}
-
-async function savePurchases() {
-  if(!currentUser) return;
-  try {
-    await supabase.from('purchases').upsert({ user_id: currentUser.id, book_ids: purchased }, { onConflict: 'user_id' });
-  } catch(e) { console.error('Save error', e); }
-}
-
-// Auth modal
-function openAuth(mode) {
-  document.getElementById('authOverlay').classList.add('open');
-  if(mode === 'login') showLogin(); else showSignup();
-}
-function closeAuth() {
-  document.getElementById('authOverlay').classList.remove('open');
-}
-function showSignup() {
-  document.getElementById('authSignup').style.display = '';
-  document.getElementById('authLogin').style.display = 'none';
-  document.getElementById('authClose').style.display = '';
-}
-function showLogin() {
-  document.getElementById('authLogin').style.display = '';
-  document.getElementById('authSignup').style.display = 'none';
-  document.getElementById('authClose').style.display = '';
-}
-
-async function doSignup() {
-  var name = document.getElementById('signupName').value.trim();
-  var email = document.getElementById('signupEmail').value.trim();
-  var password = document.getElementById('signupPassword').value;
-  var errEl = document.getElementById('signupError');
-  var sucEl = document.getElementById('signupSuccess');
-  var btn = document.getElementById('signupBtn');
-  errEl.classList.remove('show'); sucEl.classList.remove('show');
-  if(!name) { errEl.textContent = 'Please enter your name.'; errEl.classList.add('show'); return; }
-  if(!email) { errEl.textContent = 'Please enter your email.'; errEl.classList.add('show'); return; }
-  if(password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.classList.add('show'); return; }
-  btn.disabled = true; btn.textContent = 'Creating account...';
-  var { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
-  btn.disabled = false; btn.textContent = 'Create Account';
-  if(error) { errEl.textContent = error.message; errEl.classList.add('show'); return; }
-  sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
-  sucEl.classList.add('show');
-  setTimeout(function(){ showLogin(); }, 2500);
-}
-
-async function doLogin() {
-  var email = document.getElementById('loginEmail').value.trim();
-  var password = document.getElementById('loginPassword').value;
-  var errEl = document.getElementById('loginError');
-  var btn = document.getElementById('loginBtn');
-  errEl.classList.remove('show');
-  if(!email || !password) { errEl.textContent = 'Please enter email and password.'; errEl.classList.add('show'); return; }
-  btn.disabled = true; btn.textContent = 'Signing in...';
-  var { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  btn.disabled = false; btn.textContent = 'Sign In';
-  if(error) { errEl.textContent = error.message; errEl.classList.add('show'); return; }
-  closeAuth();
-  showToast('Welcome back! ');
-}
-
-async function doSignout() {
-  await supabase.auth.signOut();
-  showToast('Signed out. See you soon!');
-}
-
-// Override openLibrary to require login
-var _origOpenLibrary = openLibrary;
-openLibrary = function() {
-  if(!currentUser) { openAuth('login'); showToast('Sign in to access your library'); return; }
-  _origOpenLibrary();
-};
-
-// Override buyCurrentBook to require login
-var _origBuyCurrentBook = buyCurrentBook;
-buyCurrentBook = function() {
-  if(!currentUser) { openAuth('signup'); showToast('Create an account to purchase books'); return; }
-  _origBuyCurrentBook();
-};
-
-// Override confirmPicker to require login  
-var _origConfirmPicker = confirmPicker;
-confirmPicker = function() {
-  if(!currentUser) { openAuth('signup'); showToast('Create an account to purchase bundles'); return; }
-  _origConfirmPicker();
-};
-
-// Close auth on overlay click
-document.getElementById('authOverlay').addEventListener('click', function(e) {
-  if(e.target === this) closeAuth();
-});
-
-// Enter key on login
-document.addEventListener('keydown', function(e) {
-  if(e.key === 'Enter') {
-    var overlay = document.getElementById('authOverlay');
-    if(overlay && overlay.classList.contains('open')) {
-      if(document.getElementById('authLogin').style.display !== 'none') doLogin();
-      else doSignup();
-    }
-  }
-});
-
-// Init on load
-initAuth();
-
-
-</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1442,7 +1273,178 @@ function downloadBook(bookId) {
     htmlDoc += raw;
   }
 
-  htmlDoc += '<div class="footer"><p>Thank you for purchasing from Luminae Health Library.</p></div></body></html>';
+  htmlDoc += '<div class="footer"><p>Thank you for purchasing from Luminae Health Library.</p></div>
+<script>
+
+// ── SUPABASE AUTH ──
+const SUPABASE_URL = 'https://cnuvtnnemwjfjafllgbh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNudXZ0bm5lbXdqZmphZmxsZ2JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4OTIyNTMsImV4cCI6MjA4ODQ2ODI1M30.gm7mprHxMUqmD1kO5AVnc3cVYEFkKvGex2an4Wfm0eQ';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var currentUser = null;
+
+// Init — check if already logged in
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if(session && session.user) {
+    currentUser = session.user;
+    onLoggedIn(session.user);
+  } else {
+    onLoggedOut();
+  }
+  supabase.auth.onAuthStateChange(function(event, session) {
+    if(session && session.user) { currentUser = session.user; onLoggedIn(session.user); }
+    else { currentUser = null; onLoggedOut(); }
+  });
+}
+
+function onLoggedIn(user) {
+  var email = user.email;
+  var shortEmail = email.length > 18 ? email.substring(0,15)+'...' : email;
+  document.getElementById('navAuthArea').innerHTML =
+    '<span class="nav-user"><span class="nav-user-email">' + shortEmail + '</span>' +
+    '<button class="nav-signout" onclick="doSignout()">Sign out</button>' +
+    '<button class="nav-library-btn" onclick="openLibrary()">My Library</button></span>';
+  var mobileLib = document.getElementById('mobileLibBtn');
+  var mobileAuth = document.getElementById('mobileAuthBtn');
+  if(mobileLib) mobileLib.style.display = '';
+  if(mobileAuth) mobileAuth.style.display = 'none';
+  // Load purchased books from Supabase
+  loadPurchases(user.id);
+}
+
+function onLoggedOut() {
+  document.getElementById('navAuthArea').innerHTML =
+    '<button class="nav-signin-btn" onclick="openAuth(\'signup\')">Sign Up / Login</button>';
+  var mobileLib = document.getElementById('mobileLibBtn');
+  var mobileAuth = document.getElementById('mobileAuthBtn');
+  if(mobileLib) mobileLib.style.display = 'none';
+  if(mobileAuth) { mobileAuth.style.display = ''; mobileAuth.textContent = 'Sign Up'; }
+  purchased = [];
+  renderBooks();
+}
+
+async function loadPurchases(userId) {
+  try {
+    var res = await supabase.from('purchases').select('book_ids').eq('user_id', userId).single();
+    if(res.data && res.data.book_ids) {
+      purchased = res.data.book_ids;
+    } else {
+      purchased = [];
+    }
+  } catch(e) { purchased = []; }
+  renderBooks();
+}
+
+async function savePurchases() {
+  if(!currentUser) return;
+  try {
+    await supabase.from('purchases').upsert({ user_id: currentUser.id, book_ids: purchased }, { onConflict: 'user_id' });
+  } catch(e) { console.error('Save error', e); }
+}
+
+// Auth modal
+function openAuth(mode) {
+  document.getElementById('authOverlay').classList.add('open');
+  if(mode === 'login') showLogin(); else showSignup();
+}
+function closeAuth() {
+  document.getElementById('authOverlay').classList.remove('open');
+}
+function showSignup() {
+  document.getElementById('authSignup').style.display = '';
+  document.getElementById('authLogin').style.display = 'none';
+  document.getElementById('authClose').style.display = '';
+}
+function showLogin() {
+  document.getElementById('authLogin').style.display = '';
+  document.getElementById('authSignup').style.display = 'none';
+  document.getElementById('authClose').style.display = '';
+}
+
+async function doSignup() {
+  var name = document.getElementById('signupName').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  var password = document.getElementById('signupPassword').value;
+  var errEl = document.getElementById('signupError');
+  var sucEl = document.getElementById('signupSuccess');
+  var btn = document.getElementById('signupBtn');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+  if(!name) { errEl.textContent = 'Please enter your name.'; errEl.classList.add('show'); return; }
+  if(!email) { errEl.textContent = 'Please enter your email.'; errEl.classList.add('show'); return; }
+  if(password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.classList.add('show'); return; }
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  var { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+  btn.disabled = false; btn.textContent = 'Create Account';
+  if(error) { errEl.textContent = error.message; errEl.classList.add('show'); return; }
+  sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+  sucEl.classList.add('show');
+  setTimeout(function(){ showLogin(); }, 2500);
+}
+
+async function doLogin() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var password = document.getElementById('loginPassword').value;
+  var errEl = document.getElementById('loginError');
+  var btn = document.getElementById('loginBtn');
+  errEl.classList.remove('show');
+  if(!email || !password) { errEl.textContent = 'Please enter email and password.'; errEl.classList.add('show'); return; }
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  var { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if(error) { errEl.textContent = error.message; errEl.classList.add('show'); return; }
+  closeAuth();
+  showToast('Welcome back! ');
+}
+
+async function doSignout() {
+  await supabase.auth.signOut();
+  showToast('Signed out. See you soon!');
+}
+
+// Override openLibrary to require login
+var _origOpenLibrary = openLibrary;
+openLibrary = function() {
+  if(!currentUser) { openAuth('login'); showToast('Sign in to access your library'); return; }
+  _origOpenLibrary();
+};
+
+// Override buyCurrentBook to require login
+var _origBuyCurrentBook = buyCurrentBook;
+buyCurrentBook = function() {
+  if(!currentUser) { openAuth('signup'); showToast('Create an account to purchase books'); return; }
+  _origBuyCurrentBook();
+};
+
+// Override confirmPicker to require login  
+var _origConfirmPicker = confirmPicker;
+confirmPicker = function() {
+  if(!currentUser) { openAuth('signup'); showToast('Create an account to purchase bundles'); return; }
+  _origConfirmPicker();
+};
+
+// Close auth on overlay click
+document.getElementById('authOverlay').addEventListener('click', function(e) {
+  if(e.target === this) closeAuth();
+});
+
+// Enter key on login
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Enter') {
+    var overlay = document.getElementById('authOverlay');
+    if(overlay && overlay.classList.contains('open')) {
+      if(document.getElementById('authLogin').style.display !== 'none') doLogin();
+      else doSignup();
+    }
+  }
+});
+
+// Init on load
+initAuth();
+</script>
+</body></html>';
+</script>
+</body></html>';
   var blob = new Blob([htmlDoc], {type:'text/html'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
