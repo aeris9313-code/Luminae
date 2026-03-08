@@ -894,17 +894,13 @@ function confirmPicker() {
   if(pickerSelected.length !== pickerMax) return;
   var link = STRIPE_LINKS[pickerBundlePrice];
   if(link) {
-    var booksJson = JSON.stringify(pickerSelected);
-    // Save in multiple places to survive the redirect
-    try { localStorage.setItem('luminae_pending_books', booksJson); } catch(e) {}
-    try { sessionStorage.setItem('luminae_pending_books', booksJson); } catch(e) {}
-    // Also save as a cookie (survives cross-page)
-    try { document.cookie = 'luminae_books=' + encodeURIComponent(booksJson) + ';path=/;max-age=300'; } catch(e) {}
+    // Save picks with timestamp - only valid for 15 minutes
+    var payload = JSON.stringify({ids: pickerSelected, t: Date.now()});
+    try { localStorage.setItem('luminae_pending_books', payload); } catch(e) {}
+    try { document.cookie = 'luminae_books=' + encodeURIComponent(payload) + ';path=/;max-age=900'; } catch(e) {}
     closePicker();
     showToast('Redirecting to secure checkout...');
-    setTimeout(function(){
-      window.location.href = link;
-    }, 500);
+    setTimeout(function(){ window.location.href = link; }, 500);
   }
 }
 
@@ -1121,36 +1117,41 @@ if(urlParams.get('success') === '1') {
     setTimeout(function(){ openLibrary(); }, 600);
   }
 }
-// Handle bundle purchase — read from localStorage/sessionStorage/cookie
+// Handle bundle purchase
 if(urlParams.get('success') === 'bundle') {
   var pendingRaw = '';
-  // Try localStorage first
   try { pendingRaw = localStorage.getItem('luminae_pending_books') || ''; } catch(e) {}
-  // Try sessionStorage
-  if(!pendingRaw) { try { pendingRaw = sessionStorage.getItem('luminae_pending_books') || ''; } catch(e) {} }
-  // Try cookie
   if(!pendingRaw) {
     try {
-      var cookieMatch = document.cookie.match(/luminae_books=([^;]+)/);
-      if(cookieMatch) pendingRaw = decodeURIComponent(cookieMatch[1]);
+      var cm = document.cookie.match(/luminae_books=([^;]+)/);
+      if(cm) pendingRaw = decodeURIComponent(cm[1]);
     } catch(e) {}
   }
+  // Clear immediately so it can't be replayed
+  try { localStorage.removeItem('luminae_pending_books'); } catch(e) {}
+  try { document.cookie = 'luminae_books=;path=/;max-age=0'; } catch(e) {}
   var pendingIds = [];
-  if(pendingRaw) { try { pendingIds = JSON.parse(pendingRaw); } catch(e) {} }
+  if(pendingRaw) {
+    try {
+      var payload = JSON.parse(pendingRaw);
+      var age = Date.now() - (payload.t || 0);
+      // Only valid if picked within last 15 minutes
+      if(payload.ids && age < 900000) {
+        pendingIds = payload.ids;
+      }
+    } catch(e) {}
+  }
   if(pendingIds.length) {
     pendingIds.forEach(function(id){
       if(purchased.indexOf(id) === -1) purchased.push(id);
     });
-    try { localStorage.removeItem('luminae_pending_books'); } catch(e) {}
-    try { sessionStorage.removeItem('luminae_pending_books'); } catch(e) {}
-    try { document.cookie = 'luminae_books=;path=/;max-age=0'; } catch(e) {}
     renderBooks();
     showToast('Bundle unlocked! ' + pendingIds.length + ' books added to your library ✔');
-    // Set flag so library opens once auth confirms user is logged in
     window._openLibraryAfterAuth = true;
     window._bundleUnlockCount = pendingIds.length;
+    window._pendingBundleIds = pendingIds;
   } else {
-    showToast('Payment received! Please sign in to access your books.');
+    showToast('Payment received! Sign in to access your books.');
   }
 }
 
@@ -1224,19 +1225,16 @@ function _onLoggedIn(user, token) {
   var ml=document.getElementById('mobileLibBtn'); var ma=document.getElementById('mobileAuthBtn');
   if(ml) ml.style.display=''; if(ma) ma.style.display='none';
   _loadPurchases(user.id, token);
-  // If user just came back from bundle purchase, open library and save
+  // If user just came back from bundle purchase, open library after DB loads
   if(window._openLibraryAfterAuth) {
     window._openLibraryAfterAuth = false;
+    // _loadPurchases (called above) will merge + save pending books
+    // Just open library after it finishes
     setTimeout(function(){
-      savePurchases();
-      renderBooks();
       showToast('Bundle unlocked! ' + (window._bundleUnlockCount||'Your') + ' books are ready ✔');
-      // Open library directly without going through the auth-gated override
-      setTimeout(function(){
-        document.getElementById('libraryOverlay').classList.add('open');
-        renderLibrary();
-      }, 400);
-    }, 800);
+      document.getElementById('libraryOverlay').classList.add('open');
+      renderLibrary();
+    }, 1200);
   }
 }
 function _onLoggedOut() {
@@ -1248,17 +1246,23 @@ function _onLoggedOut() {
   purchased=[]; renderBooks();
 }
 function _loadPurchases(userId, token) {
+  // Clear purchased immediately — DB is the source of truth
+  purchased = [];
+  renderBooks();
   _supaFetch('/rest/v1/purchases?user_id=eq.'+userId+'&select=book_ids','GET',null,token)
     .then(function(rows){
       var fromDb=(rows&&rows[0]&&rows[0].book_ids)?rows[0].book_ids:[];
-      // Merge with any pending bundle books (don't overwrite them)
-      fromDb.forEach(function(id){ if(purchased.indexOf(id)===-1) purchased.push(id); });
-      // If we have new books not in DB yet, save them now
-      if(purchased.length > fromDb.length) {
-        savePurchases();
-      }
+      purchased = fromDb.slice();
+      // Merge any pending bundle books (just paid for)
+      var pending = window._pendingBundleIds || [];
+      var added = false;
+      pending.forEach(function(id){
+        if(purchased.indexOf(id)===-1){ purchased.push(id); added=true; }
+      });
+      window._pendingBundleIds = [];
+      if(added) savePurchases();
       renderBooks();
-    }).catch(function(){ renderBooks(); });
+    }).catch(function(){ purchased=[]; renderBooks(); });
 }
 function savePurchases() {
   if(!currentUser||!currentToken) return;
