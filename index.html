@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1232,7 +1231,11 @@ function _onLoggedIn(user, token) {
       savePurchases();
       renderBooks();
       showToast('Bundle unlocked! ' + (window._bundleUnlockCount||'Your') + ' books are ready ✔');
-      setTimeout(function(){ _ob(); }, 400);
+      // Open library directly without going through the auth-gated override
+      setTimeout(function(){
+        document.getElementById('libraryOverlay').classList.add('open');
+        renderLibrary();
+      }, 400);
     }, 800);
   }
 }
@@ -1247,13 +1250,25 @@ function _onLoggedOut() {
 function _loadPurchases(userId, token) {
   _supaFetch('/rest/v1/purchases?user_id=eq.'+userId+'&select=book_ids','GET',null,token)
     .then(function(rows){
-      purchased=(rows&&rows[0]&&rows[0].book_ids)?rows[0].book_ids:[];
+      var fromDb=(rows&&rows[0]&&rows[0].book_ids)?rows[0].book_ids:[];
+      // Merge with any pending bundle books (don't overwrite them)
+      fromDb.forEach(function(id){ if(purchased.indexOf(id)===-1) purchased.push(id); });
+      // If we have new books not in DB yet, save them now
+      if(purchased.length > fromDb.length) {
+        savePurchases();
+      }
       renderBooks();
-    }).catch(function(){ purchased=[]; renderBooks(); });
+    }).catch(function(){ renderBooks(); });
 }
 function savePurchases() {
   if(!currentUser||!currentToken) return;
-  _supaFetch('/rest/v1/purchases','POST',{user_id:currentUser.id,book_ids:purchased},currentToken);
+  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+currentToken,'Prefer':'resolution=merge-duplicates'};
+  fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
+}
+function _upsertPurchases(token) {
+  if(!currentUser) return;
+  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Prefer':'resolution=merge-duplicates'};
+  fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
 }
 function doSignup() {
   var name=document.getElementById('signupName').value.trim();
