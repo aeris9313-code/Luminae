@@ -1281,33 +1281,27 @@ function savePurchases() {
   var userId = currentUser.id;
   var token = currentToken;
   var toSave = purchased.slice();
-  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Prefer':'return=representation'};
-  // Check if row exists first
-  fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+userId+'&select=book_ids', {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}})
-    .then(function(r){ return r.json(); })
-    .then(function(rows){
-      var fromDb = (rows&&rows[0]&&rows[0].book_ids) ? rows[0].book_ids : [];
-      fromDb.forEach(function(id){ if(toSave.indexOf(id)===-1) toSave.push(id); });
-      toSave.forEach(function(id){ if(purchased.indexOf(id)===-1) purchased.push(id); });
-      var hasRow = rows && rows.length > 0;
-      var method = hasRow ? 'PATCH' : 'POST';
-      var url = hasRow
-        ? SUPA_URL+'/rest/v1/purchases?user_id=eq.'+userId
-        : SUPA_URL+'/rest/v1/purchases';
-      var body = hasRow
-        ? JSON.stringify({book_ids:toSave})
-        : JSON.stringify({user_id:userId, book_ids:toSave});
-      fetch(url, {method:method, headers:headers, body:body})
-        .then(function(r){ return r.json().then(function(d){ return {status:r.status, data:d}; }); })
-        .then(function(res){
-          if(res.status >= 200 && res.status < 300) {
-            showToast('Saved! ' + toSave.length + ' books in your account ✔');
-            renderBooks();
-          } else {
-            showToast('Save error ' + res.status + ': ' + JSON.stringify(res.data).slice(0,80));
-          }
-        });
-    }).catch(function(e){ showToast('Save failed: ' + e.message); });
+  // Use upsert — single call, no redirect issues
+  var headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + token,
+    'Prefer': 'resolution=merge-duplicates,return=representation'
+  };
+  fetch(SUPA_URL + '/rest/v1/purchases', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({user_id: userId, book_ids: toSave})
+  })
+  .then(function(r) {
+    if(r.status === 200 || r.status === 201) {
+      showToast('Saved! ' + toSave.length + ' books in your account ✔');
+      renderBooks();
+    } else {
+      r.text().then(function(t){ showToast('Save error ' + r.status + ': ' + t.slice(0,100)); });
+    }
+  })
+  .catch(function(e){ showToast('Save failed: ' + e.message); });
 }
 function doSignup() {
   var name=document.getElementById('signupName').value.trim();
