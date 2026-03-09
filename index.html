@@ -1278,18 +1278,30 @@ function _loadPurchases(userId, token) {
 }
 function savePurchases() {
   if(!currentUser||!currentToken) return;
-  // Use PATCH to update existing row, or POST with upsert if no row yet
-  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+currentToken,'Prefer':'return=minimal'};
-  // Try PATCH first (update existing row)
-  fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+currentUser.id, {
-    method:'PATCH', headers:headers,
-    body:JSON.stringify({book_ids:purchased})
-  }).then(function(r){
-    if(r.status === 404 || r.status === 0) {
-      // No row yet — INSERT
-      fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
-    }
-  });
+  var userId = currentUser.id;
+  var token = currentToken;
+  var toSave = purchased.slice(); // snapshot current purchased list
+  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Prefer':'return=minimal'};
+  // First fetch existing from DB to make sure we don't lose any books
+  fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+userId+'&select=book_ids', {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}})
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      var fromDb = (rows&&rows[0]&&rows[0].book_ids) ? rows[0].book_ids : [];
+      // Merge DB books + current books
+      fromDb.forEach(function(id){ if(toSave.indexOf(id)===-1) toSave.push(id); });
+      // Update purchased with full merged list
+      toSave.forEach(function(id){ if(purchased.indexOf(id)===-1) purchased.push(id); });
+      var hasRow = rows && rows.length > 0;
+      if(hasRow) {
+        fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+userId, {method:'PATCH',headers:headers,body:JSON.stringify({book_ids:toSave})});
+      } else {
+        fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:userId,book_ids:toSave})});
+      }
+      renderBooks();
+    }).catch(function(){
+      // Fallback: just try to save what we have
+      fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+userId, {method:'PATCH',headers:headers,body:JSON.stringify({book_ids:toSave})});
+    });
 }
 function doSignup() {
   var name=document.getElementById('signupName').value.trim();
