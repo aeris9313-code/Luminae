@@ -1142,14 +1142,26 @@ if(urlParams.get('success') === 'bundle') {
     } catch(e) {}
   }
   if(pendingIds.length) {
-    pendingIds.forEach(function(id){
-      if(purchased.indexOf(id) === -1) purchased.push(id);
-    });
-    renderBooks();
-    showToast('Bundle unlocked! ' + pendingIds.length + ' books added to your library ✔');
+    window._pendingBundleIds = pendingIds;
     window._openLibraryAfterAuth = true;
     window._bundleUnlockCount = pendingIds.length;
-    window._pendingBundleIds = pendingIds;
+    // If already logged in, merge + save immediately
+    if(currentUser && currentToken) {
+      pendingIds.forEach(function(id){
+        if(purchased.indexOf(id)===-1) purchased.push(id);
+      });
+      window._pendingBundleIds = [];
+      savePurchases();
+      renderBooks();
+      showToast('Bundle unlocked! ' + pendingIds.length + ' books added to your library ✔');
+      setTimeout(function(){
+        document.getElementById('libraryOverlay').classList.add('open');
+        renderLibrary();
+      }, 600);
+      window._openLibraryAfterAuth = false;
+    } else {
+      showToast('Payment received! Sign in to access your books.');
+    }
   } else {
     showToast('Payment received! Sign in to access your books.');
   }
@@ -1266,13 +1278,18 @@ function _loadPurchases(userId, token) {
 }
 function savePurchases() {
   if(!currentUser||!currentToken) return;
-  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+currentToken,'Prefer':'resolution=merge-duplicates'};
-  fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
-}
-function _upsertPurchases(token) {
-  if(!currentUser) return;
-  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Prefer':'resolution=merge-duplicates'};
-  fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
+  // Use PATCH to update existing row, or POST with upsert if no row yet
+  var headers = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+currentToken,'Prefer':'return=minimal'};
+  // Try PATCH first (update existing row)
+  fetch(SUPA_URL+'/rest/v1/purchases?user_id=eq.'+currentUser.id, {
+    method:'PATCH', headers:headers,
+    body:JSON.stringify({book_ids:purchased})
+  }).then(function(r){
+    if(r.status === 404 || r.status === 0) {
+      // No row yet — INSERT
+      fetch(SUPA_URL+'/rest/v1/purchases', {method:'POST',headers:headers,body:JSON.stringify({user_id:currentUser.id,book_ids:purchased})});
+    }
+  });
 }
 function doSignup() {
   var name=document.getElementById('signupName').value.trim();
